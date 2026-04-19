@@ -1,0 +1,502 @@
+using OpenTK.Graphics.OpenGL4;
+using OpenTK.Mathematics;
+using OpenTK.Windowing.Common;
+using OpenTK.Windowing.Desktop;
+using OpenTK.Windowing.GraphicsLibraryFramework;
+using GlfwKeys = OpenTK.Windowing.GraphicsLibraryFramework.Keys;
+
+namespace HelixSolarShow;
+
+internal sealed class HelixShowWindow : GameWindow
+{
+    private readonly List<Body> _bodies = new();
+    private readonly List<Vector3> _stars = new();
+
+    private SphereMesh _sphere;
+    private ShaderProgram _sphereShader;
+    private ShaderProgram _lineShader;
+    private ShaderProgram _pointShader;
+
+    private int _trailVao;
+    private int _trailVbo;
+    private int _starVao;
+    private int _starVbo;
+
+    private double _simDays;
+    private double _realSeconds;
+
+    private const float DaysPerSecond = 160.0f;
+    private const float ForwardUnitsPerDay = 0.38f;
+    private const int TrailSamples = 220;
+    private const float TrailSpanDays = 160.0f;
+
+    public HelixShowWindow(GameWindowSettings gws, NativeWindowSettings nws) : base(gws, nws)
+    {
+        VSync = VSyncMode.On;
+    }
+
+    protected override void OnLoad()
+    {
+        try
+        {
+            base.OnLoad();
+            CrashReporter.LogInfo("HelixShowWindow.OnLoad entered.");
+
+            CursorState = CursorState.Hidden;
+
+            GL.ClearColor(0.005f, 0.005f, 0.012f, 1f);
+            GL.Enable(EnableCap.DepthTest);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(TriangleFace.Back);
+            GL.Enable(EnableCap.Blend);
+            GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+            _sphere = new SphereMesh();
+            _sphereShader = new ShaderProgram(SphereVertexShader, SphereFragmentShader);
+            _lineShader = new ShaderProgram(LineVertexShader, LineFragmentShader);
+            _pointShader = new ShaderProgram(PointVertexShader, PointFragmentShader);
+
+            _trailVao = GL.GenVertexArray();
+            _trailVbo = GL.GenBuffer();
+            GL.BindVertexArray(_trailVao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _trailVbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, TrailSamples * 3 * sizeof(float), IntPtr.Zero, BufferUsageHint.DynamicDraw);
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.BindVertexArray(0);
+
+            _starVao = GL.GenVertexArray();
+            _starVbo = GL.GenBuffer();
+
+            BuildBodies();
+            BuildStars();
+
+            GL.BindVertexArray(_starVao);
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _starVbo);
+            var starData = _stars.SelectMany(v => new[] { v.X, v.Y, v.Z }).ToArray();
+            GL.BufferData(BufferTarget.ArrayBuffer, starData.Length * sizeof(float), starData, BufferUsageHint.StaticDraw);
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+            GL.BindVertexArray(0);
+
+            string renderer = GL.GetString(StringName.Renderer) ?? "Unknown Renderer";
+            string vendor = GL.GetString(StringName.Vendor) ?? "Unknown Vendor";
+            string version = GL.GetString(StringName.Version) ?? "Unknown OpenGL";
+            CrashReporter.LogInfo($"OnLoad completed. Renderer={renderer}; Vendor={vendor}; OpenGL={version}.");
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.ReportFatal("HelixShowWindow.OnLoad", ex, CaptureContext());
+            Close();
+        }
+    }
+
+    private void BuildBodies()
+    {
+        _bodies.Clear();
+
+        _bodies.Add(new Body("Sun", -1, 0f, 0f, 0f, 4.6f, new Vector3(1.0f, 0.76f, 0.28f), 1.65f, 26.6f, 0f, 0f));
+        _bodies.Add(new Body("Mercury", 0, 11f, 88f, 0.15f, 0.42f, new Vector3(0.70f, 0.67f, 0.64f), 0.03f, 58.6f, 0.02f, 0.6f));
+        _bodies.Add(new Body("Venus", 0, 17f, 224.7f, 1.4f, 0.72f, new Vector3(0.91f, 0.78f, 0.45f), 0.05f, -243f, 0.03f, 1.0f));
+        _bodies.Add(new Body("Earth", 0, 24f, 365.25f, 0.8f, 0.82f, new Vector3(0.25f, 0.48f, 1.0f), 0.05f, 1f, 0.04f, 0.8f));
+        _bodies.Add(new Body("Moon", 3, 1.8f, 27.3f, 2.1f, 0.22f, new Vector3(0.75f, 0.75f, 0.78f), 0.01f, 27.3f, 0.01f, 1.4f));
+        _bodies.Add(new Body("Mars", 0, 31f, 687f, 2.0f, 0.60f, new Vector3(0.86f, 0.41f, 0.22f), 0.04f, 1.03f, 0.06f, 1.2f));
+        _bodies.Add(new Body("Jupiter", 0, 47f, 4332.6f, 0.9f, 1.72f, new Vector3(0.83f, 0.64f, 0.46f), 0.05f, 0.41f, 0.05f, 0.9f));
+        _bodies.Add(new Body("Io", 6, 2.2f, 1.77f, 0.7f, 0.16f, new Vector3(0.94f, 0.78f, 0.30f), 0.01f, 1.77f, 0.00f, 0.8f));
+        _bodies.Add(new Body("Europa", 6, 3.0f, 3.55f, 1.2f, 0.17f, new Vector3(0.82f, 0.82f, 0.74f), 0.01f, 3.55f, 0.00f, 0.9f));
+        _bodies.Add(new Body("Saturn", 0, 63f, 10759f, 2.6f, 1.45f, new Vector3(0.92f, 0.82f, 0.56f), 0.05f, 0.45f, 0.04f, 1.0f, true));
+        _bodies.Add(new Body("Titan", 9, 3.6f, 15.95f, 1.3f, 0.20f, new Vector3(0.86f, 0.68f, 0.32f), 0.01f, 15.95f, 0.00f, 0.6f));
+        _bodies.Add(new Body("Uranus", 0, 78f, 30688f, 1.7f, 1.15f, new Vector3(0.54f, 0.87f, 0.92f), 0.05f, -0.72f, 0.03f, 1.6f, true));
+        _bodies.Add(new Body("Neptune", 0, 93f, 60182f, 1.8f, 1.12f, new Vector3(0.26f, 0.48f, 0.94f), 0.05f, 0.67f, 0.03f, 0.7f));
+        _bodies.Add(new Body("Pluto", 0, 108f, 90560f, 1.3f, 0.16f, new Vector3(0.73f, 0.62f, 0.52f), 0.02f, -6.39f, 0.02f, 0.5f));
+    }
+
+    private void BuildStars()
+    {
+        _stars.Clear();
+        var rng = new Random(1337);
+        for (int i = 0; i < 5000; i++)
+        {
+            float x = (float)(rng.NextDouble() * 9000.0 - 4500.0);
+            float y = (float)(rng.NextDouble() * 4500.0 - 2250.0);
+            float z = (float)(rng.NextDouble() * 4500.0 - 2250.0);
+            _stars.Add(new Vector3(x, y, z));
+        }
+    }
+
+    protected override void OnResize(ResizeEventArgs e)
+    {
+        try
+        {
+            base.OnResize(e);
+            GL.Viewport(0, 0, Size.X, Size.Y);
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.ReportFatal("HelixShowWindow.OnResize", ex, CaptureContext());
+            Close();
+        }
+    }
+
+    protected override void OnUpdateFrame(FrameEventArgs args)
+    {
+        try
+        {
+            base.OnUpdateFrame(args);
+            _realSeconds += args.Time;
+            _simDays += args.Time * DaysPerSecond;
+
+            if (KeyboardState.IsKeyPressed(GlfwKeys.Escape))
+                Close();
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.ReportFatal("HelixShowWindow.OnUpdateFrame", ex, CaptureContext());
+            Close();
+        }
+    }
+
+    protected override void OnRenderFrame(FrameEventArgs args)
+    {
+        try
+        {
+            base.OnRenderFrame(args);
+            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+            float aspect = Math.Max(1f, Size.X / (float)Math.Max(1, Size.Y));
+            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(52f), aspect, 0.1f, 12000f);
+
+            Vector3 sunPos = ComputeWorldPosition(0, _simDays);
+            float t = (float)_realSeconds;
+            float camDistance = 138f + 24f * MathF.Sin(t * 0.17f) + 12f * MathF.Sin(t * 0.051f + 1.2f);
+            float camYaw = t * 0.18f;
+            float camPitch = 0.35f + 0.16f * MathF.Sin(t * 0.11f);
+            Vector3 offset = new Vector3(
+                -camDistance,
+                MathF.Sin(camYaw) * 52f,
+                MathF.Cos(camYaw * 0.87f) * 44f + MathF.Sin(camPitch) * 18f);
+            Vector3 cameraPos = sunPos + offset;
+            Vector3 target = sunPos + new Vector3(18f, MathF.Sin(t * 0.13f) * 6f, MathF.Cos(t * 0.09f) * 4f);
+            Matrix4 view = Matrix4.LookAt(cameraPos, target, Vector3.UnitY);
+
+            RenderStars(view, projection);
+            RenderTrails(view, projection);
+            RenderBodies(view, projection, cameraPos);
+
+            SwapBuffers();
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.ReportFatal("HelixShowWindow.OnRenderFrame", ex, CaptureContext());
+            Close();
+        }
+    }
+
+    private void RenderStars(Matrix4 view, Matrix4 projection)
+    {
+        GL.DepthMask(false);
+        _pointShader.Use();
+        _pointShader.SetMatrix4("uView", view);
+        _pointShader.SetMatrix4("uProjection", projection);
+        _pointShader.SetFloat("uPointSize", 1.8f);
+        GL.BindVertexArray(_starVao);
+        GL.DrawArrays(PrimitiveType.Points, 0, _stars.Count);
+        GL.BindVertexArray(0);
+        GL.DepthMask(true);
+    }
+
+    private void RenderTrails(Matrix4 view, Matrix4 projection)
+    {
+        _lineShader.Use();
+        _lineShader.SetMatrix4("uView", view);
+        _lineShader.SetMatrix4("uProjection", projection);
+        GL.BindVertexArray(_trailVao);
+
+        for (int i = 1; i < _bodies.Count; i++)
+        {
+            var body = _bodies[i];
+            var trail = new float[TrailSamples * 3];
+            for (int s = 0; s < TrailSamples; s++)
+            {
+                double back = TrailSpanDays * (s / (double)(TrailSamples - 1));
+                Vector3 pos = ComputeWorldPosition(i, _simDays - back);
+                trail[s * 3 + 0] = pos.X;
+                trail[s * 3 + 1] = pos.Y;
+                trail[s * 3 + 2] = pos.Z;
+            }
+            GL.BindBuffer(BufferTarget.ArrayBuffer, _trailVbo);
+            GL.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, trail.Length * sizeof(float), trail);
+            float alpha = body.ParentIndex == 0 ? 0.32f : 0.18f;
+            _lineShader.SetVector4("uColor", new Vector4(body.Color, alpha));
+            GL.DrawArrays(PrimitiveType.LineStrip, 0, TrailSamples);
+        }
+
+        GL.BindVertexArray(0);
+    }
+
+    private void RenderBodies(Matrix4 view, Matrix4 projection, Vector3 cameraPos)
+    {
+        _sphereShader.Use();
+        _sphereShader.SetMatrix4("uView", view);
+        _sphereShader.SetMatrix4("uProjection", projection);
+        _sphereShader.SetVector3("uCameraPos", cameraPos);
+        _sphereShader.SetVector3("uLightPos", ComputeWorldPosition(0, _simDays));
+        GL.BindVertexArray(_sphere.VertexArray);
+
+        for (int i = 0; i < _bodies.Count; i++)
+        {
+            var body = _bodies[i];
+            Vector3 pos = ComputeWorldPosition(i, _simDays);
+            float spin = body.RotationDays != 0f ? (float)(_simDays / body.RotationDays) * MathF.Tau : 0f;
+
+            Matrix4 model =
+                Matrix4.CreateRotationY(spin) *
+                Matrix4.CreateScale(body.Size) *
+                Matrix4.CreateTranslation(pos);
+
+            _sphereShader.SetMatrix4("uModel", model);
+            _sphereShader.SetVector3("uBaseColor", body.Color);
+            _sphereShader.SetFloat("uEmission", body.Emission);
+            _sphereShader.SetInt("uBodyType", body.HasRings ? 2 : (i == 0 ? 0 : 1));
+            _sphereShader.SetFloat("uTime", (float)_realSeconds * 0.25f + i * 1.7f);
+            GL.DrawElements(PrimitiveType.Triangles, _sphere.IndexCount, DrawElementsType.UnsignedInt, 0);
+
+            if (body.HasRings)
+                RenderRings(pos, body.Size * 1.55f, body.Size * 2.45f, view, projection, body.Color * 0.95f + new Vector3(0.05f));
+        }
+
+        GL.BindVertexArray(0);
+    }
+
+    private void RenderRings(Vector3 center, float innerRadius, float outerRadius, Matrix4 view, Matrix4 projection, Vector3 color)
+    {
+        Span<float> verts = stackalloc float[6 * 64];
+        int count = 0;
+        for (int i = 0; i <= 63; i++)
+        {
+            float a = i / 63f * MathF.Tau;
+            float c = MathF.Cos(a);
+            float s = MathF.Sin(a);
+            verts[count++] = center.X + c * innerRadius;
+            verts[count++] = center.Y + s * innerRadius * 0.16f;
+            verts[count++] = center.Z + s * innerRadius;
+            verts[count++] = center.X + c * outerRadius;
+            verts[count++] = center.Y + s * outerRadius * 0.16f;
+            verts[count++] = center.Z + s * outerRadius;
+        }
+
+        int vao = GL.GenVertexArray();
+        int vbo = GL.GenBuffer();
+        GL.BindVertexArray(vao);
+        GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+        GL.BufferData(BufferTarget.ArrayBuffer, verts.Length * sizeof(float), verts.ToArray(), BufferUsageHint.StreamDraw);
+        GL.EnableVertexAttribArray(0);
+        GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+
+        _lineShader.Use();
+        _lineShader.SetMatrix4("uView", view);
+        _lineShader.SetMatrix4("uProjection", projection);
+        _lineShader.SetVector4("uColor", new Vector4(color, 0.35f));
+        GL.DrawArrays(PrimitiveType.TriangleStrip, 0, 64 * 2);
+
+        GL.BindVertexArray(0);
+        GL.DeleteBuffer(vbo);
+        GL.DeleteVertexArray(vao);
+    }
+
+    private Vector3 ComputeWorldPosition(int index, double simDays)
+    {
+        var body = _bodies[index];
+        if (body.ParentIndex < 0)
+            return new Vector3((float)(simDays * ForwardUnitsPerDay), 0f, 0f);
+
+        Vector3 parent = ComputeWorldPosition(body.ParentIndex, simDays);
+        double angle = simDays / body.OrbitDays * Math.PI * 2.0 + body.Phase;
+        float ca = (float)Math.Cos(angle);
+        float sa = (float)Math.Sin(angle);
+
+        Vector3 rel = new Vector3(
+            0f,
+            body.OrbitRadius * ca,
+            body.OrbitRadius * sa);
+
+        float incline = body.Inclination;
+        if (Math.Abs(incline) > 0.0001f)
+        {
+            float c = MathF.Cos(incline);
+            float s = MathF.Sin(incline);
+            rel = new Vector3(
+                rel.X,
+                rel.Y * c - rel.Z * s,
+                rel.Y * s + rel.Z * c);
+        }
+
+        float wobble = body.VerticalWobble * MathF.Sin((float)angle * 0.7f + body.Phase * 1.3f);
+        rel.X += wobble;
+
+        return parent + rel;
+    }
+
+    private string CaptureContext()
+    {
+        return $"simDays={_simDays:F3}; realSeconds={_realSeconds:F3}; bodies={_bodies.Count}; size={Size.X}x{Size.Y}";
+    }
+
+    protected override void OnUnload()
+    {
+        try
+        {
+            base.OnUnload();
+            CrashReporter.LogInfo("HelixShowWindow.OnUnload entered.");
+            _sphereShader?.Dispose();
+            _lineShader?.Dispose();
+            _pointShader?.Dispose();
+            _sphere?.Dispose();
+            if (_trailVbo != 0) GL.DeleteBuffer(_trailVbo);
+            if (_trailVao != 0) GL.DeleteVertexArray(_trailVao);
+            if (_starVbo != 0) GL.DeleteBuffer(_starVbo);
+            if (_starVao != 0) GL.DeleteVertexArray(_starVao);
+            CrashReporter.LogInfo("HelixShowWindow.OnUnload completed.");
+        }
+        catch (Exception ex)
+        {
+            CrashReporter.ReportFatal("HelixShowWindow.OnUnload", ex, CaptureContext());
+        }
+    }
+
+    private readonly record struct Body(
+        string Name,
+        int ParentIndex,
+        float OrbitRadius,
+        float OrbitDays,
+        float Phase,
+        float Size,
+        Vector3 Color,
+        float Emission,
+        float RotationDays,
+        float VerticalWobble,
+        float Inclination,
+        bool HasRings = false);
+
+    private const string SphereVertexShader = @"
+#version 330 core
+layout(location = 0) in vec3 aPosition;
+layout(location = 1) in vec3 aNormal;
+
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+
+out vec3 vWorldPos;
+out vec3 vNormal;
+out vec3 vObjectPos;
+
+void main()
+{
+    vec4 world = uModel * vec4(aPosition, 1.0);
+    vWorldPos = world.xyz;
+    vNormal = normalize(mat3(transpose(inverse(uModel))) * aNormal);
+    vObjectPos = aPosition;
+    gl_Position = uProjection * uView * world;
+}";
+
+    private const string SphereFragmentShader = @"
+#version 330 core
+in vec3 vWorldPos;
+in vec3 vNormal;
+in vec3 vObjectPos;
+
+uniform vec3 uCameraPos;
+uniform vec3 uLightPos;
+uniform vec3 uBaseColor;
+uniform float uEmission;
+uniform int uBodyType;
+uniform float uTime;
+
+out vec4 FragColor;
+
+float hash(vec3 p)
+{
+    return fract(sin(dot(p, vec3(12.9898, 78.233, 45.164))) * 43758.5453);
+}
+
+void main()
+{
+    vec3 n = normalize(vNormal);
+    vec3 l = normalize(uLightPos - vWorldPos);
+    vec3 v = normalize(uCameraPos - vWorldPos);
+    vec3 h = normalize(l + v);
+
+    float diff = max(dot(n, l), 0.0);
+    float spec = pow(max(dot(n, h), 0.0), 48.0);
+    float rim = pow(1.0 - max(dot(n, v), 0.0), 2.4);
+
+    vec3 color = uBaseColor;
+    if (uBodyType == 1)
+    {
+        float lat = asin(clamp(vObjectPos.y, -1.0, 1.0));
+        float lon = atan(vObjectPos.z, vObjectPos.x);
+        float band = 0.5 + 0.5 * sin(lat * 18.0 + uTime * 0.5);
+        float noise = hash(normalize(vObjectPos) * 17.0);
+        color *= mix(0.85, 1.12, band * 0.6 + noise * 0.4);
+
+        if (uBaseColor.b > uBaseColor.r + 0.25)
+        {
+            float cloud = smoothstep(0.58, 0.75, hash(vec3(lon * 2.0, lat * 3.0, uTime * 0.15)));
+            color = mix(color, vec3(0.92, 0.95, 1.0), cloud * 0.20);
+        }
+    }
+    else if (uBodyType == 2)
+    {
+        float band = 0.5 + 0.5 * sin(vObjectPos.y * 21.0 + uTime * 0.35);
+        color *= mix(0.82, 1.18, band);
+    }
+
+    vec3 ambient = color * 0.12;
+    vec3 lit = color * diff + vec3(spec) * 0.45 + vec3(rim) * 0.20;
+    vec3 emissive = color * uEmission;
+    FragColor = vec4(ambient + lit + emissive, 1.0);
+}";
+
+    private const string LineVertexShader = @"
+#version 330 core
+layout(location = 0) in vec3 aPosition;
+uniform mat4 uView;
+uniform mat4 uProjection;
+void main()
+{
+    gl_Position = uProjection * uView * vec4(aPosition, 1.0);
+}";
+
+    private const string LineFragmentShader = @"
+#version 330 core
+uniform vec4 uColor;
+out vec4 FragColor;
+void main()
+{
+    FragColor = uColor;
+}";
+
+    private const string PointVertexShader = @"
+#version 330 core
+layout(location = 0) in vec3 aPosition;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform float uPointSize;
+void main()
+{
+    gl_Position = uProjection * uView * vec4(aPosition, 1.0);
+    gl_PointSize = uPointSize;
+}";
+
+    private const string PointFragmentShader = @"
+#version 330 core
+out vec4 FragColor;
+void main()
+{
+    vec2 uv = gl_PointCoord * 2.0 - 1.0;
+    float d = dot(uv, uv);
+    float a = smoothstep(1.0, 0.1, d);
+    FragColor = vec4(vec3(1.0), a * 0.9);
+}";
+}
