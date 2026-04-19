@@ -1,0 +1,150 @@
+<Window x:Class="NewtonsCradleStudio.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:NewtonsCradleStudio"
+        Title="Newton's Cradle Studio"
+        Width="1440"
+        Height="960"
+        WindowStartupLocation="CenterScreen"
+        Background="#090E17"
+        MinWidth="980"
+        MinHeight="720"
+        KeyDown="Window_OnKeyDown">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Margin="16"
+                Padding="14"
+                CornerRadius="18"
+                Background="#AA101827"
+                BorderBrush="#33FFFFFF"
+                BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="220" />
+                    <ColumnDefinition Width="180" />
+                    <ColumnDefinition Width="220" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="ResetButton"
+                        Grid.Column="0"
+                        MinWidth="120"
+                        Height="38"
+                        Margin="0,0,10,0"
+                        Padding="18,6"
+                        Click="ResetButton_OnClick"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Content="Reset" />
+
+                <Button x:Name="PauseButton"
+                        Grid.Column="1"
+                        MinWidth="120"
+                        Height="38"
+                        Margin="0,0,10,0"
+                        Padding="18,6"
+                        Click="PauseButton_OnClick"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Content="Pause" />
+
+                <Button x:Name="FullscreenButton"
+                        Grid.Column="2"
+                        MinWidth="140"
+                        Height="38"
+                        Margin="0,0,14,0"
+                        Padding="18,6"
+                        Click="FullscreenButton_OnClick"
+                        FontSize="15"
+                        FontWeight="SemiBold"
+                        Content="Fullscreen" />
+
+                <CheckBox x:Name="IdealModeCheckBox"
+                          Grid.Column="3"
+                          VerticalAlignment="Center"
+                          Margin="0,0,18,0"
+                          FontSize="15"
+                          FontWeight="SemiBold"
+                          Foreground="#F2F7FF"
+                          IsChecked="True"
+                          Checked="IdealModeCheckBox_OnChanged"
+                          Unchecked="IdealModeCheckBox_OnChanged"
+                          Content="Ideal transfer" />
+
+                <StackPanel Grid.Column="4"
+                            Margin="0,0,18,0"
+                            VerticalAlignment="Center">
+                    <TextBlock Foreground="#EAF2FF"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="Energy loss" />
+                    <Slider x:Name="LossSlider"
+                            Minimum="0"
+                            Maximum="0.04"
+                            Value="0.003"
+                            SmallChange="0.001"
+                            LargeChange="0.005"
+                            ValueChanged="LossSlider_OnValueChanged" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="5"
+                            Margin="0,0,18,0"
+                            VerticalAlignment="Center">
+                    <TextBlock Foreground="#EAF2FF"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="Ball count" />
+                    <Slider x:Name="CountSlider"
+                            Minimum="3"
+                            Maximum="7"
+                            Value="5"
+                            TickFrequency="1"
+                            IsSnapToTickEnabled="True"
+                            ValueChanged="CountSlider_OnValueChanged" />
+                </StackPanel>
+
+                <StackPanel Grid.Column="6"
+                            Margin="0,0,18,0"
+                            VerticalAlignment="Center">
+                    <TextBlock Foreground="#EAF2FF"
+                               FontSize="13"
+                               FontWeight="SemiBold"
+                               Text="Time scale" />
+                    <Slider x:Name="TimeScaleSlider"
+                            Minimum="0.25"
+                            Maximum="2.5"
+                            Value="1.0"
+                            SmallChange="0.05"
+                            LargeChange="0.25"
+                            ValueChanged="TimeScaleSlider_OnValueChanged" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="7"
+                           VerticalAlignment="Center"
+                           Foreground="#B9C7D9"
+                           FontSize="14"
+                           TextWrapping="Wrap">
+                    Click a ball, pull it back, then release. Drag motion carries into the launch so you can gently place it or flick it. Press F11 for fullscreen and Esc to leave it.
+                </TextBlock>
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1"
+                Margin="16,0,16,16"
+                CornerRadius="26"
+                Background="#AA0B111C"
+                BorderBrush="#33FFFFFF"
+                BorderThickness="1"
+                SnapsToDevicePixels="True">
+            <local:CradleControl x:Name="Cradle" />
+        </Border>
+    </Grid>
+</Window>

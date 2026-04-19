@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>AICreatureLab</RootNamespace>
+    <AssemblyName>AICreatureLab</AssemblyName>
+    <StartupObject>AICreatureLab.Program</StartupObject>
+
+    <ApplicationTitle>AI Creature Lab</ApplicationTitle>
+    <Product>AI Creature Lab</Product>
+    <Description>Original C# evolutionary AI-creature simulator inspired by the AI creature evolution video workflow.</Description>
+    <Company>OpenAI for user project packaging</Company>
+    <Authors>OpenAI</Authors>
+    <Version>1.0.3</Version>
+    <AssemblyVersion>1.0.3.0</AssemblyVersion>
+    <FileVersion>1.0.3.0</FileVersion>
+    <InformationalVersion>1.0.3</InformationalVersion>
+  </PropertyGroup>
+
+</Project>
