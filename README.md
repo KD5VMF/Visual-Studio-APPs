@@ -1,85 +1,66 @@
-# C# Simulations, Sandboxes, and Visual Experiments
+# LifeForge Accelerated
 
-This repository is a collection of Windows desktop C# projects focused on interactive simulation, scientific-style visualization, evolutionary systems, physics toys, and graphical experiments.
+This is a full rewrite of the prior WinForms/GDI version.
 
-Most of the projects are designed to be opened directly in **Visual Studio** and run as standalone desktop apps. Across the repo you will find a mix of:
+## What changed
 
-- **Windows Forms** applications
-- **WPF** desktop applications
-- **OpenTK / OpenGL** accelerated visual projects
-- simulation-heavy experiments built for modern Windows PCs
+- OpenGL renderer through **OpenTK** instead of WinForms/GDI drawing
+- multithreaded world updates using `Parallel.For`
+- HUD and text are rendered into a texture and refreshed periodically instead of every frame, which should stop the visible text flashing/shimmering
+- fullscreen button in the UI, plus **F11** and **Esc**
+- worker thread count can be adjusted with **[** and **]**
+- simulation speed can be adjusted with **-** and **+**
 
-## What this repo includes
+## Controls
 
-### AI Creature Lab
-A higher-workload creature evolution simulator with neural-net creatures, champion save/load support, and a parallel update path designed to use many logical CPU threads.
+- **Pause/Resume** button or **Space**
+- **Reset** button or **R**
+- **Fullscreen** button or **F11**
+- **Esc** leaves fullscreen
+- **Help** button or **H**
+- **- / +** change simulation speed
+- **[ / ]** change worker thread count
+- Click a creature or object to inspect it
 
-### Atom Playground
-A visually rich atomic sandbox where you can spawn atoms and clusters, manipulate protons/neutrons/electrons, switch between chemistry, nuclear, and hybrid modes, and observe simplified but grounded reactions.
+## Important note about your two RTX 3060 cards
 
-### Dimension Explorer
-A dimension and hypercube viewer that lets you explore 1D through 12D using rotating projection-based hypercube rendering with zoom, drag rotation, auto-rotation, and optional labels/axes.
+This build uses one GPU for the actual rendering window.
+That is normal for a single OpenGL windowed app on Windows.
+A future step could move the neural-network/inference part to a compute path so the second GPU can do useful work too, but that is a different architecture step.
 
-### Great Fluid Dynamics Rebuilt
-A cleaner 2D incompressible fluid simulation project featuring advection, pressure projection, buoyancy, vorticity confinement, multiple render modes, and interactive dye/force injection. The v2 build also adds an automatic swirl-driven startup mode for a more attractive first launch.
+## Build
 
-### Helix Solar Show
-A fullscreen OpenTK/OpenGL space animation that turns the solar system into a cinematic helical motion display, with shaded 3D spheres, orbital trails, automatic camera movement, and screensaver-like presentation.
+Open the `.csproj` in Visual Studio 2022 or later and restore NuGet packages.
+Then build and run normally.
 
-### LifeForge Accelerated
-An accelerated life/evolution-style simulation using OpenTK for rendering, multithreaded world updates, fullscreen support, HUD textures, and adjustable simulation speed and worker-thread count.
+## Honest note
 
-### Newton's Cradle Studio
-A polished Newton's cradle desktop physics toy with click-and-drag pull/release interaction, adjustable ball count, time scale, and tuned near-ideal momentum transfer behavior.
+This source was written carefully but not compiled inside the container because the container does not have the .NET SDK installed.
+If Visual Studio reports any compile error at all, send the exact error text and it can be patched directly.
 
-### PredatorPreyEvolutionCS
-A predator-prey evolution simulation with plants, food, prey, predators, simple per-agent neural networks, mutation, reproduction, live history graphs, and click-to-inspect behavior.
 
-## General setup
+Patch notes for fix2:
+- Explicit MousePosition float casts for OpenTK API compatibility.
+- PixelFormat aliases retained to avoid System.Drawing/OpenGL ambiguity.
+- RenderFrequency assignment remains removed.
 
-Most folders in this repository contain their own solution or project file and a local README with project-specific notes.
 
-In general, the workflow is:
+Patch notes for final button/window fix:
+- Switched HUD, world sizing, and overlay rebuilds to the window client area instead of the outer window size.
+- Added more robust mouse click handling so UI buttons still work even if the mouse Y origin is reported from the bottom.
+- Fullscreen restore now saves and restores the client size used by the simulation.
 
-1. Open the relevant folder.
-2. Open the `.sln` or `.csproj` file in **Visual Studio 2022 or 2026**.
-3. Allow package restore if prompted.
-4. Build and run.
 
-## Common technologies used
+Patch notes for autonomous evolution persistence:
+- Added automatic species-specific training save/load using `Prey_Training.json` and `Predator_Training.json` in a dedicated `training` folder beside the app.
+- The sim now keeps one persistent prey training file and one persistent predator training file instead of rotating save slots.
+- Manual reset now saves the current trained state first, then respawns from the latest learned data.
+- Window close now saves the current trained state automatically.
+- When every predator and prey dies out, the world saves one more extinction snapshot and rebirths a fresh population using the saved training bank.
+- Saved training carries forward evolved brains, traits, remembered directions, and shared culture memory.
 
-Depending on the project, you will see combinations of:
-
-- **.NET 8**
-- **Windows Forms**
-- **WPF**
-- **OpenTK / OpenGL**
-
-## Good starting points
-
-If you are new to the repo, these are good first launches:
-
-- **Atom Playground** for hands-on sandbox interaction
-- **Newton's Cradle Studio** for a clean physics demo
-- **Dimension Explorer** for math/visual exploration
-- **Great Fluid Dynamics Rebuilt v2** for fluid-style motion and visuals
-- **Helix Solar Show** for a fullscreen visual showcase
-
-## Notes
-
-- These projects aim to be **interactive, visually interesting, and understandable**, not always laboratory-grade scientific solvers.
-- Some simulations are intentionally **grounded but simplified** so they stay responsive and enjoyable in real time.
-- Several projects are especially well suited to stronger desktop hardware, including high-core-count CPUs and modern GPUs.
-
-## Repository purpose
-
-The overall goal of this repo is to collect a wide variety of C# experiments that mix:
-
-- simulation
-- visualization
-- learning/evolution systems
-- interactive physics
-- science-inspired sandboxes
-- visually impressive desktop rendering
-
-If you want project-specific controls, limitations, or upgrade ideas, open the README inside that project's folder.
+Patch notes for species-collapse recovery:
+- If all prey die but predators still exist, the sim now saves that collapse state and immediately respawns a fresh prey generation from the trained memory bank.
+- If all predators die but prey still exist, the sim now saves that collapse state and immediately respawns a fresh predator generation from the trained memory bank.
+- Collapse recovery also restores baseline food/water/plant resources so the new generation has a fair chance to continue evolving instead of stalling out.
+- Predator recovery seeds a small emergency carrion reserve, and prey recovery seeds extra fruit food, to help the ecosystem restart smoothly.
