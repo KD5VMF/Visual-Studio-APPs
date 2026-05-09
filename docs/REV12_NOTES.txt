@@ -1,0 +1,21 @@
+PFLT13 Rev 13 - pfSense Live Telemetry
+
+Rev 13 fixes the bad Mbps/Gbps number problem across the whole dashboard.
+
+What changed:
+- Raw SNMP byte counters stay raw internally.
+- Rates are calculated once from byte deltas per second.
+- Mbps/Gbps display auto-scales cleanly:
+  - below 1000 Mbps = Mbps
+  - 1000 Mbps and above = Gbps
+- Counter resets and interface reselects are detected instead of becoming fake giant Gbps values.
+- 32-bit SNMP counter rollover is handled correctly.
+- Impossible one-sample spikes are filtered so Max Download, Max Upload, Total Now, Top Ports, and graphs do not get poisoned.
+- Top Upload/Download port cards use the same safe scaling/filtering.
+- App/settings/log folder changed to Documents\PFLT13.
+
+Run:
+1. Open the PFLT13 folder.
+2. Double-click build_and_run.cmd.
+
+If Windows blocks the app, right-click the ZIP, Properties, Unblock, then extract again.

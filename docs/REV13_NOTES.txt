@@ -1,0 +1,11 @@
+PFLT13 Rev 13
+
+Fixes and improvements:
+- RX BYTES and TX BYTES now auto-scale: Bytes, KBytes, MBytes, GBytes, TBytes.
+- Link speed labels now show full units: Mbps/Gbps/Tbps.
+- Added correction for Realtek/re interfaces that incorrectly report 50,000 Mbps for a 5 Gbps link.
+- Selected interface/port is used for live upload, live download, total now, max values, byte counters, live data, CSV logging, and status text.
+- Speed values continue to auto-scale correctly: Mbps -> Gbps -> Tbps without fake giant numbers.
+- Keeps the short name: PFLT13.
+
+Run: open PFLT13 folder and run build_and_run.cmd

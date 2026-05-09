@@ -1,0 +1,25 @@
+PFLT13 Rev 13 - pfSense Live Telemetry
+
+How to run:
+1. Extract the ZIP.
+2. Open the PFLT13 folder.
+3. Double-click build_and_run.cmd.
+
+Rev 13 changes:
+- Short project name: PFLT13.
+- New 30-box dashboard layout with cleaner rounded cards and stronger contrast.
+- More live data boxes: link speed, duplex, health, direction, scale, retries, top upload/download ports, SFP temp/voltage, state/load, byte counters, and peaks.
+- Better color behavior: traffic values turn green/yellow/red based on scale/load.
+- Improved SNMP reliability: each SNMP request retries up to 3 times before failing.
+- Auto reconnect: after repeated poll failures, the app tries to reconnect automatically.
+- Settings/log/debug files now go under Documents\PFLT13.
+
+Notes:
+- Still uses SNMP v2c only. No SSH, no pfSense web GUI login, no scraping, no speed test.
+- If the selected card/port is wrong, click Settings and choose the connected interface manually.
+- ESC exits. Window button toggles fullscreen/window mode.
+
+Rev 13 scale/display patch:
+- Live speed boxes now auto-format per value: Mbps below 1000, Gbps at/above 1000.
+- Max/peak boxes, TX/RX detail boxes, live data, debug data, top port lines, and gauge center text use the same scaler.
+- Numbers shorten when they cross into Gbps so the boxes stay readable.

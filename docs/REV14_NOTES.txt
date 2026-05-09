@@ -1,0 +1,17 @@
+PFLT14 Rev 14 - pfSense Live Telemetry
+
+Rev 14 keeps the working Rev 13 SNMP backend and updates the visual dashboard to match the newer screenshot style:
+
+- New PFLT14 short name.
+- Full-screen high-end card layout.
+- Larger top status/header buttons.
+- New monitoring-port selector card on the main screen.
+- New graph cards for total traffic, byte history, port breakdown, latency/probe history, and extra port activity.
+- Keeps Rev 13 fixes for Mbps/Gbps scaling, 5G display, selected-port data, auto byte units, saved selected interface, retries, logs, debug copy/save, and screenshots.
+
+How to run:
+1. Extract the ZIP.
+2. Open the PFLT14 folder.
+3. Double-click build_and_run.cmd.
+
+Settings/log/debug files are stored under Documents\PFLT14.

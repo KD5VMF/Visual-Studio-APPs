@@ -1,0 +1,78 @@
+<Window x:Class="PfSenseLiveShield.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="PFLT14 Rev 14" WindowState="Maximized" WindowStyle="None" ResizeMode="NoResize" Topmost="True" Background="#050A12" Foreground="#EAF2FF">
+    <Window.Resources>
+        <DropShadowEffect x:Key="CardShadow" BlurRadius="18" ShadowDepth="0" Opacity="0.45" Color="#000000"/>
+        <LinearGradientBrush x:Key="MainBg" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#07101E" Offset="0"/><GradientStop Color="#050A12" Offset="0.55"/><GradientStop Color="#081728" Offset="1"/></LinearGradientBrush>
+        <LinearGradientBrush x:Key="CardBg" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#0C2440" Offset="0"/><GradientStop Color="#071424" Offset="1"/></LinearGradientBrush>
+        <LinearGradientBrush x:Key="GreenBg" StartPoint="0,0" EndPoint="1,1"><GradientStop Color="#104A29" Offset="0"/><GradientStop Color="#062915" Offset="1"/></LinearGradientBrush>
+        <Style TargetType="Button"><Setter Property="Background" Value="#081A31"/><Setter Property="Foreground" Value="#F8FAFC"/><Setter Property="BorderBrush" Value="#1E3A5F"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Padding" Value="10,5"/><Setter Property="Margin" Value="4,0"/><Setter Property="FontSize" Value="11"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+        <Style x:Key="Panel" TargetType="Border"><Setter Property="CornerRadius" Value="14"/><Setter Property="Background" Value="{StaticResource CardBg}"/><Setter Property="BorderBrush" Value="#12395D"/><Setter Property="BorderThickness" Value="1"/><Setter Property="Padding" Value="12"/><Setter Property="Margin" Value="4"/><Setter Property="Effect" Value="{StaticResource CardShadow}"/></Style>
+        <Style x:Key="PanelTitle" TargetType="TextBlock"><Setter Property="Foreground" Value="#F8FAFC"/><Setter Property="FontSize" Value="13"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="TextAlignment" Value="Center"/><Setter Property="Margin" Value="0,0,0,6"/></Style>
+        <Style x:Key="BigValue" TargetType="TextBlock"><Setter Property="Foreground" Value="#24E34B"/><Setter Property="FontSize" Value="27"/><Setter Property="FontWeight" Value="Black"/><Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="TextAlignment" Value="Center"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
+        <Style x:Key="BigBlue" TargetType="TextBlock" BasedOn="{StaticResource BigValue}"><Setter Property="Foreground" Value="#20A8FF"/><Setter Property="FontSize" Value="34"/></Style>
+        <Style x:Key="SmallValue" TargetType="TextBlock"><Setter Property="Foreground" Value="#EAF2FF"/><Setter Property="FontSize" Value="15"/><Setter Property="FontWeight" Value="SemiBold"/><Setter Property="HorizontalAlignment" Value="Center"/><Setter Property="TextAlignment" Value="Center"/><Setter Property="TextWrapping" Value="Wrap"/></Style>
+    </Window.Resources>
+
+    <Grid Background="{StaticResource MainBg}" Margin="8">
+        <Grid.RowDefinitions><RowDefinition Height="60"/><RowDefinition Height="*"/><RowDefinition Height="34"/></Grid.RowDefinitions>
+        <DockPanel Grid.Row="0" LastChildFill="True">
+            <TextBlock Text="PFLT14" FontSize="28" FontWeight="Black" Foreground="#F8FAFC" VerticalAlignment="Center" Margin="8,0,20,0"/>
+            <TextBlock x:Name="StatusText" Text="Live from pfSense SNMP" FontSize="14" Foreground="#00C8FF" VerticalAlignment="Center"/>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="SettingsButton" Content="⚙ Settings" Click="SettingsButton_Click"/>
+                <Button x:Name="ReconnectButton" Content="⟳ Reconnect" Click="ReconnectButton_Click"/>
+                <Button x:Name="MuteButton" Content="🔊 Mute" Click="MuteButton_Click"/>
+                <Button x:Name="ResetButton" Content="🧹 Clear" Click="ResetButton_Click"/>
+                <Button x:Name="OpenLogsButton" Content="Logs" Click="OpenLogsButton_Click"/>
+                <Button x:Name="CopyDebugButton" Content="Copy Debug" Click="CopyDebugButton_Click"/>
+                <Button x:Name="SaveDebugButton" Content="Save Debug" Click="SaveDebugButton_Click"/>
+                <Button x:Name="WindowModeButton" Content="Window" Click="WindowModeButton_Click"/>
+                <Button x:Name="SaveScreenshotButton" Content="Shot" Click="SaveScreenshotButton_Click"/>
+                <Button Content="Exit" Click="ExitButton_Click"/>
+            </StackPanel>
+        </DockPanel>
+
+        <UniformGrid Grid.Row="1" Columns="6" Rows="5">
+            <Border Style="{StaticResource Panel}" Background="{StaticResource GreenBg}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="DNS PROBE"/><TextBlock x:Name="DnsStatusText" Text="UP" FontSize="46" FontWeight="Black" Foreground="#F8FAFC" HorizontalAlignment="Center"/><TextBlock x:Name="HttpStatusText" Text="HTTP UP" Foreground="#16FF5A" FontWeight="Bold" HorizontalAlignment="Center"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="SELECTED INTERFACE"/><TextBlock x:Name="WanText" Style="{StaticResource BigBlue}" Text="re0"/><TextBlock x:Name="SourceText" Style="{StaticResource SmallValue}" Text="SNMP"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="LINK SPEED"/><TextBlock x:Name="LinkSpeedText" Style="{StaticResource BigBlue}" Text="--"/><TextBlock x:Name="ScaleText" Style="{StaticResource SmallValue}" Foreground="#16FF5A" Text="Auto-Negotiated"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="DUPLEX"/><TextBlock x:Name="DuplexText" Style="{StaticResource SmallValue}" FontSize="24" Text="UNKNOWN"/><TextBlock x:Name="HealthStateText" Style="{StaticResource SmallValue}" Foreground="#00C8FF" Text="--"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="MONITORING PORT"/><ComboBox x:Name="MonitorPortCombo" Height="34" Background="#0B2340" Foreground="#F8FAFC" BorderBrush="#1E5280" SelectionChanged="MonitorPortCombo_SelectionChanged"/><TextBlock x:Name="RouterDataText" Foreground="#DDEAFF" FontSize="12" TextWrapping="Wrap" Text="Waiting for SNMP data..." Margin="0,8,0,0"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="LINK STATUS"/><TextBlock x:Name="DirectionText" Style="{StaticResource BigValue}" Text="UP"/><TextBlock x:Name="AlertText" Foreground="#FF5C62" FontWeight="Bold" TextWrapping="Wrap" HorizontalAlignment="Center"/></StackPanel></Border>
+
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="UPLOAD NOW"/><TextBlock x:Name="TxValue" Style="{StaticResource BigValue}" Text="0 Mbps"/><TextBlock x:Name="TxStatSmall" Style="{StaticResource SmallValue}" Text="0 bps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="DOWNLOAD NOW"/><TextBlock x:Name="RxValue" Style="{StaticResource BigValue}" Text="0 Mbps"/><TextBlock x:Name="RxStatSmall" Style="{StaticResource SmallValue}" Text="0 bps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="TOTAL NOW (UP + DOWN)"/><TextBlock x:Name="MixValue" Style="{StaticResource BigValue}" Text="0 Mbps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="TOTAL UP"/><TextBlock x:Name="OutBytesText" Style="{StaticResource BigValue}" FontSize="24" Text="0 Bytes"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="TOTAL DOWN"/><TextBlock x:Name="InBytesText" Style="{StaticResource BigValue}" FontSize="24" Text="0 Bytes"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Style="{StaticResource PanelTitle}" Text="TOTAL NOW (24H)"/><Canvas x:Name="WanChart" Grid.Row="1" MinHeight="92"/></Grid></Border>
+
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="MAX UPLOAD"/><TextBlock x:Name="TxPeakText" Style="{StaticResource BigValue}" Text="0 Mbps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="MAX DOWNLOAD"/><TextBlock x:Name="RxPeakText" Style="{StaticResource BigValue}" Text="0 Mbps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="MAX TOTAL (UP + DOWN)"/><TextBlock x:Name="MixPeakText" Style="{StaticResource BigValue}" Text="0 Mbps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="STATE TABLE"/><TextBlock x:Name="StateCountText" Style="{StaticResource BigBlue}" Text="0"/><TextBlock x:Name="StatePercentText" Style="{StaticResource SmallValue}" Text="0.00%"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="SNMP STATUS"/><TextBlock x:Name="RetryText" Style="{StaticResource BigValue}" Text="OK"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Style="{StaticResource PanelTitle}" Text="BYTES (24H)"/><Canvas x:Name="GreenChart" Grid.Row="1" MinHeight="92"/></Grid></Border>
+
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="PING"/><TextBlock x:Name="PingText" Style="{StaticResource BigValue}" Foreground="#FFE84A" Text="-- ms"/><TextBlock Style="{StaticResource SmallValue}" Text="Average"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="JITTER"/><TextBlock x:Name="JitterText" Style="{StaticResource BigValue}" Text="--"/><TextBlock Style="{StaticResource SmallValue}" Text="Average"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="PACKET LOSS"/><TextBlock x:Name="LossText" Style="{StaticResource BigValue}" Foreground="#FF5C62" Text="0.0%"/><TextBlock Style="{StaticResource SmallValue}" Text="Loss"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="TX BYTES"/><TextBlock x:Name="TopUpBox" Style="{StaticResource BigBlue}" FontSize="22" Text="pending"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="RX BYTES"/><TextBlock x:Name="TopDownBox" Style="{StaticResource BigBlue}" FontSize="22" Text="pending"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Style="{StaticResource PanelTitle}" Text="PORT BREAKDOWN (NOW)"/><Canvas x:Name="PurpleChart" Grid.Row="1" MinHeight="92"/></Grid></Border>
+
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="IF SPEED (REPORTED)"/><TextBlock x:Name="HealthMirrorText" Style="{StaticResource BigBlue}" Text="5 Gbps"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="SFP TEMP"/><TextBlock x:Name="SfpTempBox" Style="{StaticResource BigBlue}" Text="45.5 °C"/><TextBlock Style="{StaticResource SmallValue}" Text="Normal"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><StackPanel VerticalAlignment="Center"><TextBlock Style="{StaticResource PanelTitle}" Text="SFP VOLTAGE"/><TextBlock x:Name="VoltageBox" Style="{StaticResource BigBlue}" Text="3.34 V"/><TextBlock Style="{StaticResource SmallValue}" Text="Normal"/></StackPanel></Border>
+            <Border Style="{StaticResource Panel}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Style="{StaticResource PanelTitle}" Text="LATENCY GRAPH"/><Canvas x:Name="StateChart" Grid.Row="1" MinHeight="92"/></Grid></Border>
+            <Border Style="{StaticResource Panel}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Style="{StaticResource PanelTitle}" Text="PROBE GRAPH"/><Canvas x:Name="HttpProbeChart" Grid.Row="1" MinHeight="92"/></Grid></Border>
+            <Border Style="{StaticResource Panel}"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="*"/></Grid.RowDefinitions><TextBlock Style="{StaticResource PanelTitle}" Text="EXTRA PORT GRAPH"/><Canvas x:Name="Switch01Chart" Grid.Row="1" MinHeight="92"/></Grid></Border>
+        </UniformGrid>
+
+        <TextBox Grid.Row="2" x:Name="DebugText" FontSize="11" Foreground="#9CB4D8" Background="#07111D" BorderBrush="#12395D" IsReadOnly="True" TextWrapping="NoWrap" VerticalScrollBarVisibility="Hidden" HorizontalScrollBarVisibility="Auto" FontFamily="Consolas"/>
+        <TextBlock x:Name="ConsoleText" Visibility="Collapsed"/>
+        <Canvas x:Name="TxGauge" Visibility="Collapsed"/><Canvas x:Name="RxGauge" Visibility="Collapsed"/><Canvas x:Name="VpnChart" Visibility="Collapsed"/><Canvas x:Name="FirewallChart" Visibility="Collapsed"/><Canvas x:Name="DnsProbeChart" Visibility="Collapsed"/><Canvas x:Name="SwitchApChart" Visibility="Collapsed"/><Canvas x:Name="SwitchCtrlChart" Visibility="Collapsed"/>
+    </Grid>
+</Window>

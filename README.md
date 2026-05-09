@@ -1,66 +1,144 @@
-# LifeForge Accelerated
+# PFLT14 — pfSense Live Telemetry Rev 14
 
-This is a full rewrite of the prior WinForms/GDI version.
+PFLT14 is a full-screen Windows dashboard for watching a pfSense router/firewall in real time using SNMP. It was built to be simple for a home lab: no SSH scraping, no pfSense web login, and no paid monitoring stack required.
 
-## What changed
+The dashboard shows live traffic, selected-interface stats, link speed, byte counters, latency/probe health, retry status, peak values, and multiple graph-style cards in one clean screen.
 
-- OpenGL renderer through **OpenTK** instead of WinForms/GDI drawing
-- multithreaded world updates using `Parallel.For`
-- HUD and text are rendered into a texture and refreshed periodically instead of every frame, which should stop the visible text flashing/shimmering
-- fullscreen button in the UI, plus **F11** and **Esc**
-- worker thread count can be adjusted with **[** and **]**
-- simulation speed can be adjusted with **-** and **+**
+## What it does
 
-## Controls
+- Reads pfSense interface counters through SNMP v2c.
+- Lets you choose the monitored interface/port from the dashboard.
+- Saves the selected port and settings under `Documents\PFLT14`.
+- Auto-scales traffic display from Mbps to Gbps/Tbps when needed.
+- Auto-scales byte counters from Bytes to KBytes/MBytes/GBytes/TBytes.
+- Handles counter resets, 32-bit rollover, and impossible one-sample spikes.
+- Corrects common bad 5G link-speed reporting where some interfaces report `50 Gbps` instead of `5 Gbps`.
+- Includes reconnect/retry behavior for more stable long-running monitoring.
+- Provides debug copy/save, logs, CSV output, screenshots, and a fullscreen/window toggle.
 
-- **Pause/Resume** button or **Space**
-- **Reset** button or **R**
-- **Fullscreen** button or **F11**
-- **Esc** leaves fullscreen
-- **Help** button or **H**
-- **- / +** change simulation speed
-- **[ / ]** change worker thread count
-- Click a creature or object to inspect it
+## Requirements
 
-## Important note about your two RTX 3060 cards
+### PC
 
-This build uses one GPU for the actual rendering window.
-That is normal for a single OpenGL windowed app on Windows.
-A future step could move the neural-network/inference part to a compute path so the second GPU can do useful work too, but that is a different architecture step.
+- Windows 10 or Windows 11.
+- .NET 8 SDK, recommended for building from source.
+  - Install the **.NET 8 SDK for Windows x64** from Microsoft.
+- Network access from the PC to pfSense on UDP port `161`.
 
-## Build
+### pfSense
 
-Open the `.csproj` in Visual Studio 2022 or later and restore NuGet packages.
-Then build and run normally.
+- pfSense with SNMP enabled.
+- SNMP v2c community string configured.
+- Firewall rule allowing the dashboard PC to reach pfSense on UDP `161`.
 
-## Honest note
+This program does **not** need pfSense SSH access, web GUI credentials, or admin password storage.
 
-This source was written carefully but not compiled inside the container because the container does not have the .NET SDK installed.
-If Visual Studio reports any compile error at all, send the exact error text and it can be patched directly.
+## Quick start
 
+1. Download or clone this repository.
+2. Open the folder:
 
-Patch notes for fix2:
-- Explicit MousePosition float casts for OpenTK API compatibility.
-- PixelFormat aliases retained to avoid System.Drawing/OpenGL ambiguity.
-- RenderFrequency assignment remains removed.
+   ```text
+   src\PFLT14
+   ```
 
+3. Double-click:
 
-Patch notes for final button/window fix:
-- Switched HUD, world sizing, and overlay rebuilds to the window client area instead of the outer window size.
-- Added more robust mouse click handling so UI buttons still work even if the mouse Y origin is reported from the bottom.
-- Fullscreen restore now saves and restores the client size used by the simulation.
+   ```text
+   build_and_run.cmd
+   ```
 
+4. In the app, open **Settings**.
+5. Enter your pfSense address, SNMP community string, and port.
+6. Use **Test / Discover** in settings, then choose the correct interface/port.
 
-Patch notes for autonomous evolution persistence:
-- Added automatic species-specific training save/load using `Prey_Training.json` and `Predator_Training.json` in a dedicated `training` folder beside the app.
-- The sim now keeps one persistent prey training file and one persistent predator training file instead of rotating save slots.
-- Manual reset now saves the current trained state first, then respawns from the latest learned data.
-- Window close now saves the current trained state automatically.
-- When every predator and prey dies out, the world saves one more extinction snapshot and rebirths a fresh population using the saved training bank.
-- Saved training carries forward evolved brains, traits, remembered directions, and shared culture memory.
+Default example values are:
 
-Patch notes for species-collapse recovery:
-- If all prey die but predators still exist, the sim now saves that collapse state and immediately respawns a fresh prey generation from the trained memory bank.
-- If all predators die but prey still exist, the sim now saves that collapse state and immediately respawns a fresh predator generation from the trained memory bank.
-- Collapse recovery also restores baseline food/water/plant resources so the new generation has a fair chance to continue evolving instead of stalling out.
-- Predator recovery seeds a small emergency carrion reserve, and prey recovery seeds extra fruit food, to help the ecosystem restart smoothly.
+```text
+Router: 192.168.1.1
+SNMP Port: 161
+Community: public
+```
+
+Change the community string to match your pfSense setup. Do not publish your real private community string in screenshots, commits, or bug reports.
+
+## Recommended pfSense SNMP setup
+
+In pfSense:
+
+1. Go to **Services → SNMP**.
+2. Enable SNMP.
+3. Set a community string.
+4. Limit access to your trusted LAN when possible.
+5. Add or confirm a firewall rule that permits the monitoring PC to reach pfSense on UDP `161`.
+
+For safety, use a unique community string instead of `public`.
+
+## Build manually
+
+From PowerShell or Command Prompt:
+
+```bat
+cd src\PFLT14
+dotnet restore
+dotnet build -c Release
+dotnet run -c Release
+```
+
+## Project layout
+
+```text
+PFLT14_GitHub_Ready/
+├─ README.md
+├─ LICENSE
+├─ CHANGELOG.md
+├─ CONTRIBUTING.md
+├─ .gitignore
+├─ src/
+│  └─ PFLT14/
+│     ├─ App.xaml
+│     ├─ App.xaml.cs
+│     ├─ MainWindow.xaml
+│     ├─ MainWindow.xaml.cs
+│     ├─ PFLT14.csproj
+│     └─ build_and_run.cmd
+└─ docs/
+   ├─ REV11_NOTES.txt
+   ├─ REV12_NOTES.txt
+   ├─ REV13_NOTES.txt
+   └─ REV14_NOTES.txt
+```
+
+## Data and logs
+
+PFLT14 stores its local data here:
+
+```text
+Documents\PFLT14
+```
+
+That folder may include settings, logs, debug text, CSV data, and screenshots. Those files are intentionally ignored by Git and should not be committed unless you have reviewed them.
+
+## Troubleshooting
+
+### App cannot connect
+
+Check:
+
+- pfSense SNMP service is enabled.
+- The pfSense IP address is correct.
+- The SNMP community string is correct.
+- UDP `161` is allowed from your PC to pfSense.
+- You are monitoring the correct pfSense interface.
+
+### Wrong interface is shown
+
+Open **Settings**, run discovery, and manually select the correct interface/port. PFLT14 saves that selection for the next launch.
+
+### Windows blocks the downloaded ZIP
+
+Right-click the ZIP, choose **Properties**, check **Unblock**, click **Apply**, then extract again.
+
+## Notes
+
+This is a helpful home-lab telemetry dashboard. It is not a replacement for enterprise monitoring systems, but it is great for learning, visual checking, and watching a pfSense router live on a dedicated screen.
