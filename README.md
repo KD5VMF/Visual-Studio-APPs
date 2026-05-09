@@ -142,3 +142,194 @@ Right-click the ZIP, choose **Properties**, check **Unblock**, click **Apply**, 
 ## Notes
 
 This is a helpful home-lab telemetry dashboard. It is not a replacement for enterprise monitoring systems, but it is great for learning, visual checking, and watching a pfSense router live on a dedicated screen.
+
+
+# Home Lab Projects Repository
+
+A collection of open-source hardware, software, networking, FPGA, AI, telemetry, and homelab projects focused on learning, experimentation, visualization, and practical real-world systems.
+
+This repository contains projects ranging from FPGA development and AI simulations to pfSense telemetry dashboards, cluster computing, SDR tools, Minecraft AI systems, and embedded hardware development.
+
+---
+
+# Featured Projects
+
+---
+
+# PFLT14 — pfSense Live Telemetry Rev 14
+
+PFLT14 is a full-screen Windows dashboard for watching a pfSense router/firewall in real time using SNMP.
+
+It was designed for home labs and dedicated monitoring screens where users want clean, live telemetry without requiring enterprise monitoring stacks, browser dashboards, SSH scraping, or cloud services.
+
+## Features
+
+- Real-time pfSense SNMP telemetry
+- Fullscreen dashboard UI
+- Automatic Mbps/Gbps/Tbps scaling
+- Automatic byte-unit scaling
+- Interface discovery and selection
+- Retry/reconnect handling
+- Peak tracking and graph-style cards
+- CSV logging and screenshot support
+- Saved settings and persistent monitored-port selection
+- Long-running stable monitoring behavior
+
+## What it does
+
+- Reads pfSense interface counters through SNMP v2c
+- Lets users choose monitored interfaces directly from the dashboard
+- Saves settings locally under:
+
+```text
+Documents\PFLT14
+```
+
+- Corrects common 5G reporting issues where interfaces incorrectly report `50 Gbps`
+- Handles counter rollovers and impossible spike values
+- Provides fullscreen and windowed operation modes
+
+## Requirements
+
+### PC
+
+- Windows 10 or Windows 11
+- .NET 8 SDK for building from source
+- Network access to pfSense over UDP 161
+
+### pfSense
+
+- SNMP enabled
+- SNMP v2c community configured
+- Firewall rule permitting UDP 161 access from the monitoring PC
+
+## Quick Start
+
+1. Open:
+
+```text
+src\PFLT14
+```
+
+2. Run:
+
+```text
+build_and_run.cmd
+```
+
+3. Open Settings inside the app
+4. Enter pfSense IP and SNMP community
+5. Run interface discovery
+6. Select the correct monitored interface
+
+## Recommended SNMP Security
+
+- Use a custom community string
+- Restrict SNMP to trusted LAN devices
+- Never expose UDP 161 publicly
+- Avoid sharing screenshots with private SNMP data visible
+
+## Why This Exists
+
+PFLT14 was built to provide a lightweight, visually clean telemetry dashboard for pfSense users who want:
+
+- simple setup
+- real-time visibility
+- fullscreen monitoring
+- no cloud dependency
+- no browser dashboards
+- no SSH scraping
+
+The goal is practical live telemetry for real home labs.
+
+## Status
+
+Stable and tested in long-running home-lab environments.
+
+---
+
+# Additional Projects
+
+This repository may also include:
+
+- FPGA development projects
+- Vivado and Verilog examples
+- SDR tools and utilities
+- AI simulations and autonomous systems
+- Cluster-computing experiments
+- Minecraft AI and automation systems
+- Embedded-system development
+- Retro-computing projects
+- Visualization dashboards
+- Network-monitoring tools
+- Scientific simulations
+
+---
+
+# Repository Goals
+
+This repository exists to:
+
+- help people learn
+- provide practical examples
+- share useful tools
+- encourage experimentation
+- support home-lab communities
+- create understandable open projects
+
+---
+
+# Security Notice
+
+Some projects may interact with:
+
+- routers
+- SDR hardware
+- SNMP services
+- automation systems
+- cluster nodes
+- embedded hardware
+
+Always review configurations before exposing systems to public networks.
+
+Never publish private credentials, keys, SNMP community strings, or sensitive network details.
+
+---
+
+# Releases
+
+Releases may include:
+
+- source code
+- ZIP packages
+- build scripts
+- documentation
+- setup instructions
+- screenshots
+- revision notes
+
+---
+
+# Planned Future Improvements
+
+- Expanded telemetry systems
+- Additional SNMP support
+- Improved graphing
+- Multi-device dashboards
+- GPU-assisted visualizations
+- AI-assisted monitoring ideas
+- Better long-term logging systems
+- Additional FPGA and embedded projects
+
+---
+
+# License
+
+See the LICENSE file for licensing details.
+
+---
+
+# Thank You
+
+If these projects help you learn, experiment, or build something interesting, that means the repository succeeded. :)
+
