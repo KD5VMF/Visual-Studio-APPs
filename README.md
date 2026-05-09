@@ -4,7 +4,24 @@ PFLT14 is a full-screen Windows dashboard for watching a pfSense router/firewall
 
 The dashboard shows live traffic, selected-interface stats, link speed, byte counters, latency/probe health, retry status, peak values, and multiple graph-style cards in one clean screen.
 
-## What it does
+---
+
+# Features
+
+- Real-time pfSense SNMP telemetry
+- Fullscreen dashboard UI
+- Automatic Mbps/Gbps/Tbps scaling
+- Automatic byte-unit scaling
+- Interface discovery and selection
+- Retry/reconnect handling
+- Peak tracking and graph-style cards
+- CSV logging and screenshot support
+- Saved settings and persistent monitored-port selection
+- Long-running stable monitoring behavior
+
+---
+
+# What it does
 
 - Reads pfSense interface counters through SNMP v2c.
 - Lets you choose the monitored interface/port from the dashboard.
@@ -16,41 +33,59 @@ The dashboard shows live traffic, selected-interface stats, link speed, byte cou
 - Includes reconnect/retry behavior for more stable long-running monitoring.
 - Provides debug copy/save, logs, CSV output, screenshots, and a fullscreen/window toggle.
 
-## Requirements
+---
 
-### PC
+# Why PFLT14 Exists
+
+PFLT14 was created to provide a lightweight, visually clean pfSense telemetry dashboard for home labs and dedicated monitoring screens without requiring enterprise monitoring stacks, SSH scraping, browser dashboards, or cloud services.
+
+The goal is simple:
+
+- real-time visibility
+- minimal setup
+- fullscreen monitoring
+- lightweight operation
+- useful live telemetry
+
+---
+
+# Requirements
+
+## PC
 
 - Windows 10 or Windows 11.
 - .NET 8 SDK, recommended for building from source.
-  - Install the **.NET 8 SDK for Windows x64** from Microsoft.
+  - Install the .NET 8 SDK for Windows x64 from Microsoft.
 - Network access from the PC to pfSense on UDP port `161`.
 
-### pfSense
+## pfSense
 
 - pfSense with SNMP enabled.
 - SNMP v2c community string configured.
 - Firewall rule allowing the dashboard PC to reach pfSense on UDP `161`.
 
-This program does **not** need pfSense SSH access, web GUI credentials, or admin password storage.
+This program does not need pfSense SSH access, web GUI credentials, or admin password storage.
 
-## Quick start
+---
+
+# Quick start
 
 1. Download or clone this repository.
 2. Open the folder:
 
-   ```text
-   src\PFLT14
-   ```
+```text
+src\PFLT14
+```
 
 3. Double-click:
 
-   ```text
-   build_and_run.cmd
-   ```
+```text
+build_and_run.cmd
+```
 
-4. In the app, open **Settings**.
+4. In the app, open Settings.
 5. Enter your pfSense address, SNMP community string, and port.
-6. Use **Test / Discover** in settings, then choose the correct interface/port.
+6. Use Test / Discover in settings, then choose the correct interface/port.
 
 Default example values are:
 
@@ -60,13 +95,17 @@ SNMP Port: 161
 Community: public
 ```
 
-Change the community string to match your pfSense setup. Do not publish your real private community string in screenshots, commits, or bug reports.
+Change the community string to match your pfSense setup.
 
-## Recommended pfSense SNMP setup
+Do not publish your real private community string in screenshots, commits, or bug reports.
+
+---
+
+# Recommended pfSense SNMP setup
 
 In pfSense:
 
-1. Go to **Services → SNMP**.
+1. Go to Services → SNMP.
 2. Enable SNMP.
 3. Set a community string.
 4. Limit access to your trusted LAN when possible.
@@ -74,7 +113,22 @@ In pfSense:
 
 For safety, use a unique community string instead of `public`.
 
-## Build manually
+---
+
+# Security Notes
+
+SNMP v2c is plaintext on the network.
+
+For best security:
+
+- Use a custom community string
+- Restrict SNMP access to trusted LAN systems
+- Do not expose UDP 161 to the internet
+- Avoid sharing screenshots containing private SNMP information
+
+---
+
+# Build manually
 
 From PowerShell or Command Prompt:
 
@@ -85,7 +139,9 @@ dotnet build -c Release
 dotnet run -c Release
 ```
 
-## Project layout
+---
+
+# Project layout
 
 ```text
 PFLT14_GitHub_Ready/
@@ -106,10 +162,13 @@ PFLT14_GitHub_Ready/
    ├─ REV11_NOTES.txt
    ├─ REV12_NOTES.txt
    ├─ REV13_NOTES.txt
-   └─ REV14_NOTES.txt
+   ├─ REV14_NOTES.txt
+   └─ PROGRAMS.md
 ```
 
-## Data and logs
+---
+
+# Data and logs
 
 PFLT14 stores its local data here:
 
@@ -117,11 +176,15 @@ PFLT14 stores its local data here:
 Documents\PFLT14
 ```
 
-That folder may include settings, logs, debug text, CSV data, and screenshots. Those files are intentionally ignored by Git and should not be committed unless you have reviewed them.
+That folder may include settings, logs, debug text, CSV data, and screenshots.
 
-## Troubleshooting
+Those files are intentionally ignored by Git and should not be committed unless you have reviewed them.
 
-### App cannot connect
+---
+
+# Troubleshooting
+
+## App cannot connect
 
 Check:
 
@@ -131,120 +194,28 @@ Check:
 - UDP `161` is allowed from your PC to pfSense.
 - You are monitoring the correct pfSense interface.
 
-### Wrong interface is shown
+## Wrong interface is shown
 
-Open **Settings**, run discovery, and manually select the correct interface/port. PFLT14 saves that selection for the next launch.
+Open Settings, run discovery, and manually select the correct interface/port.
 
-### Windows blocks the downloaded ZIP
+PFLT14 saves that selection for the next launch.
 
-Right-click the ZIP, choose **Properties**, check **Unblock**, click **Apply**, then extract again.
+## Windows blocks the downloaded ZIP
 
-## Notes
-
-This is a helpful home-lab telemetry dashboard. It is not a replacement for enterprise monitoring systems, but it is great for learning, visual checking, and watching a pfSense router live on a dedicated screen.
-
-
-# Home Lab Projects Repository
-
-A collection of open-source hardware, software, networking, FPGA, AI, telemetry, and homelab projects focused on learning, experimentation, visualization, and practical real-world systems.
-
-This repository contains projects ranging from FPGA development and AI simulations to pfSense telemetry dashboards, cluster computing, SDR tools, Minecraft AI systems, and embedded hardware development.
+Right-click the ZIP, choose Properties, check Unblock, click Apply, then extract again.
 
 ---
 
-# Featured Projects
+# Repository Goals
 
----
+This repository exists to:
 
-# PFLT14 — pfSense Live Telemetry Rev 14
-
-PFLT14 is a full-screen Windows dashboard for watching a pfSense router/firewall in real time using SNMP.
-
-It was designed for home labs and dedicated monitoring screens where users want clean, live telemetry without requiring enterprise monitoring stacks, browser dashboards, SSH scraping, or cloud services.
-
-## Features
-
-- Real-time pfSense SNMP telemetry
-- Fullscreen dashboard UI
-- Automatic Mbps/Gbps/Tbps scaling
-- Automatic byte-unit scaling
-- Interface discovery and selection
-- Retry/reconnect handling
-- Peak tracking and graph-style cards
-- CSV logging and screenshot support
-- Saved settings and persistent monitored-port selection
-- Long-running stable monitoring behavior
-
-## What it does
-
-- Reads pfSense interface counters through SNMP v2c
-- Lets users choose monitored interfaces directly from the dashboard
-- Saves settings locally under:
-
-```text
-Documents\PFLT14
-```
-
-- Corrects common 5G reporting issues where interfaces incorrectly report `50 Gbps`
-- Handles counter rollovers and impossible spike values
-- Provides fullscreen and windowed operation modes
-
-## Requirements
-
-### PC
-
-- Windows 10 or Windows 11
-- .NET 8 SDK for building from source
-- Network access to pfSense over UDP 161
-
-### pfSense
-
-- SNMP enabled
-- SNMP v2c community configured
-- Firewall rule permitting UDP 161 access from the monitoring PC
-
-## Quick Start
-
-1. Open:
-
-```text
-src\PFLT14
-```
-
-2. Run:
-
-```text
-build_and_run.cmd
-```
-
-3. Open Settings inside the app
-4. Enter pfSense IP and SNMP community
-5. Run interface discovery
-6. Select the correct monitored interface
-
-## Recommended SNMP Security
-
-- Use a custom community string
-- Restrict SNMP to trusted LAN devices
-- Never expose UDP 161 publicly
-- Avoid sharing screenshots with private SNMP data visible
-
-## Why This Exists
-
-PFLT14 was built to provide a lightweight, visually clean telemetry dashboard for pfSense users who want:
-
-- simple setup
-- real-time visibility
-- fullscreen monitoring
-- no cloud dependency
-- no browser dashboards
-- no SSH scraping
-
-The goal is practical live telemetry for real home labs.
-
-## Status
-
-Stable and tested in long-running home-lab environments.
+- help people learn
+- provide practical examples
+- share useful tools
+- encourage experimentation
+- support home-lab communities
+- create understandable open projects
 
 ---
 
@@ -266,36 +237,6 @@ This repository may also include:
 
 ---
 
-# Repository Goals
-
-This repository exists to:
-
-- help people learn
-- provide practical examples
-- share useful tools
-- encourage experimentation
-- support home-lab communities
-- create understandable open projects
-
----
-
-# Security Notice
-
-Some projects may interact with:
-
-- routers
-- SDR hardware
-- SNMP services
-- automation systems
-- cluster nodes
-- embedded hardware
-
-Always review configurations before exposing systems to public networks.
-
-Never publish private credentials, keys, SNMP community strings, or sensitive network details.
-
----
-
 # Releases
 
 Releases may include:
@@ -312,14 +253,24 @@ Releases may include:
 
 # Planned Future Improvements
 
-- Expanded telemetry systems
-- Additional SNMP support
-- Improved graphing
-- Multi-device dashboards
+- Additional SNMP sensor support
+- Historical graphing improvements
+- Multi-router monitoring
+- Improved interface auto-detection
+- Optional dark/light themes
+- Better packet-loss visualization
 - GPU-assisted visualizations
-- AI-assisted monitoring ideas
-- Better long-term logging systems
-- Additional FPGA and embedded projects
+- AI-assisted monitoring concepts
+
+---
+
+# Notes
+
+This is a helpful home-lab telemetry dashboard.
+
+It is not a replacement for enterprise monitoring systems, but it is great for learning, visual checking, and watching a pfSense router live on a dedicated screen.
+
+Stable and tested in long-running home-lab environments.
 
 ---
 
@@ -332,4 +283,3 @@ See the LICENSE file for licensing details.
 # Thank You
 
 If these projects help you learn, experiment, or build something interesting, that means the repository succeeded. :)
-
