@@ -1,12 +1,99 @@
-# PFLT14 — pfSense Live Telemetry Rev 14
+# Visual Studio APPs
 
-PFLT14 is a full-screen Windows dashboard for watching a pfSense router/firewall in real time using SNMP. It was built to be simple for a home lab: no SSH scraping, no pfSense web login, and no paid monitoring stack required.
+**Visual Studio APPs** is a collection of Windows / Visual Studio / C# projects made for fun, learning, experiments, graphics, simulations, AI ideas, science-style visual tools, and home-lab utilities.
 
-The dashboard shows live traffic, selected-interface stats, link speed, byte counters, latency/probe health, retry status, peak values, and multiple graph-style cards in one clean screen.
+This repo is meant to help people explore code, build projects, learn by example, and try interesting desktop applications without needing a huge paid software stack.
 
 ---
 
-# Features
+# Programs In This Repository
+
+## AICreatureLab_v1.0.3
+
+An AI creature simulation / experiment project focused on creature behavior, learning ideas, movement, and visual simulation.  
+Good for experimenting with autonomous agents and artificial life concepts.
+
+---
+
+## AtomPlayground_v10
+
+A scientifically inspired atom / particle / physics visualization playground.  
+This project is aimed at visual learning, experimentation, and making science-style concepts easier to see on screen.
+
+---
+
+## BioGenesisX_v15b
+
+A larger biological / artificial-life style simulation project.  
+Focused on evolving life-like behavior, survival pressure, population behavior, and long-running simulated systems.
+
+---
+
+## DimExplorer
+
+A dimension-exploration style C# WinForms project.  
+Designed as a visual experiment for exploring space, dimensions, graphics, and interactive ideas.
+
+---
+
+## GreatFluidDynamics_Rebuilt
+
+A fluid-dynamics visualization project rebuilt for better structure and usability.  
+Useful for experimenting with visual flow, movement, and simulation-style graphics.
+
+---
+
+## GreatFluidDynamics_Rebuilt_v2
+
+Second rebuilt version of the fluid-dynamics project.  
+Includes additional fixes, improvements, and newer experiment work compared to the first rebuilt version.
+
+---
+
+## HelixSolarShow_Project_v5
+
+A solar-system / helix-style visualization project.  
+Built for showing motion, space, orbital-style movement, and visually interesting solar-system concepts.
+
+---
+
+## LifeForgeAccelerated v9
+
+An accelerated life / evolution simulation project.  
+Focused on fast-running simulation behavior, life-like rules, and visual experimentation.
+
+---
+
+## LifeForgeAccelerated_autoevolution_persistence
+
+A LifeForge version focused on auto-evolution and persistence.  
+Designed so simulation progress can continue, save, and build on previous learning or state.
+
+---
+
+## LifeForgeAccelerated_gpu_multithreaded_final_fix2
+
+A higher-performance LifeForge version using GPU / multithreaded ideas where practical.  
+Focused on making the simulation work harder and run faster on stronger systems.
+
+---
+
+## NewtonsCradleStudio_v3
+
+A Newton’s cradle physics / graphics project.  
+Good for learning physics visualization, motion, timing, collision-style behavior, and clean desktop graphics.
+
+---
+
+## PFLT14 — pfSense Live Telemetry Rev 14
+
+PFLT14 is a full-screen Windows dashboard for watching a pfSense router/firewall in real time using SNMP.
+
+It was built to be simple for a home lab: no SSH scraping, no pfSense web login, and no paid monitoring stack required.
+
+The dashboard shows live traffic, selected-interface stats, link speed, byte counters, latency/probe health, retry status, peak values, and multiple graph-style cards in one clean screen.
+
+### PFLT14 Features
 
 - Real-time pfSense SNMP telemetry
 - Fullscreen dashboard UI
@@ -19,9 +106,7 @@ The dashboard shows live traffic, selected-interface stats, link speed, byte cou
 - Saved settings and persistent monitored-port selection
 - Long-running stable monitoring behavior
 
----
-
-# What it does
+### What PFLT14 does
 
 - Reads pfSense interface counters through SNMP v2c.
 - Lets you choose the monitored interface/port from the dashboard.
@@ -33,42 +118,23 @@ The dashboard shows live traffic, selected-interface stats, link speed, byte cou
 - Includes reconnect/retry behavior for more stable long-running monitoring.
 - Provides debug copy/save, logs, CSV output, screenshots, and a fullscreen/window toggle.
 
----
+### PFLT14 Requirements
 
-# Why PFLT14 Exists
-
-PFLT14 was created to provide a lightweight, visually clean pfSense telemetry dashboard for home labs and dedicated monitoring screens without requiring enterprise monitoring stacks, SSH scraping, browser dashboards, or cloud services.
-
-The goal is simple:
-
-- real-time visibility
-- minimal setup
-- fullscreen monitoring
-- lightweight operation
-- useful live telemetry
-
----
-
-# Requirements
-
-## PC
+#### PC
 
 - Windows 10 or Windows 11.
 - .NET 8 SDK, recommended for building from source.
-  - Install the .NET 8 SDK for Windows x64 from Microsoft.
 - Network access from the PC to pfSense on UDP port `161`.
 
-## pfSense
+#### pfSense
 
 - pfSense with SNMP enabled.
 - SNMP v2c community string configured.
 - Firewall rule allowing the dashboard PC to reach pfSense on UDP `161`.
 
-This program does not need pfSense SSH access, web GUI credentials, or admin password storage.
+PFLT14 does **not** need pfSense SSH access, web GUI credentials, or admin password storage.
 
----
-
-# Quick start
+### PFLT14 Quick Start
 
 1. Download or clone this repository.
 2. Open the folder:
@@ -83,9 +149,9 @@ src\PFLT14
 build_and_run.cmd
 ```
 
-4. In the app, open Settings.
+4. In the app, open **Settings**.
 5. Enter your pfSense address, SNMP community string, and port.
-6. Use Test / Discover in settings, then choose the correct interface/port.
+6. Use **Test / Discover** in settings, then choose the correct interface/port.
 
 Default example values are:
 
@@ -99,13 +165,11 @@ Change the community string to match your pfSense setup.
 
 Do not publish your real private community string in screenshots, commits, or bug reports.
 
----
-
-# Recommended pfSense SNMP setup
+### Recommended pfSense SNMP Setup
 
 In pfSense:
 
-1. Go to Services → SNMP.
+1. Go to **Services → SNMP**.
 2. Enable SNMP.
 3. Set a community string.
 4. Limit access to your trusted LAN when possible.
@@ -113,22 +177,18 @@ In pfSense:
 
 For safety, use a unique community string instead of `public`.
 
----
-
-# Security Notes
+### PFLT14 Security Notes
 
 SNMP v2c is plaintext on the network.
 
 For best security:
 
-- Use a custom community string
-- Restrict SNMP access to trusted LAN systems
-- Do not expose UDP 161 to the internet
-- Avoid sharing screenshots containing private SNMP information
+- Use a custom community string.
+- Restrict SNMP access to trusted LAN systems.
+- Do not expose UDP 161 to the internet.
+- Avoid sharing screenshots containing private SNMP information.
 
----
-
-# Build manually
+### Build PFLT14 Manually
 
 From PowerShell or Command Prompt:
 
@@ -139,36 +199,7 @@ dotnet build -c Release
 dotnet run -c Release
 ```
 
----
-
-# Project layout
-
-```text
-PFLT14_GitHub_Ready/
-├─ README.md
-├─ LICENSE
-├─ CHANGELOG.md
-├─ CONTRIBUTING.md
-├─ .gitignore
-├─ src/
-│  └─ PFLT14/
-│     ├─ App.xaml
-│     ├─ App.xaml.cs
-│     ├─ MainWindow.xaml
-│     ├─ MainWindow.xaml.cs
-│     ├─ PFLT14.csproj
-│     └─ build_and_run.cmd
-└─ docs/
-   ├─ REV11_NOTES.txt
-   ├─ REV12_NOTES.txt
-   ├─ REV13_NOTES.txt
-   ├─ REV14_NOTES.txt
-   └─ PROGRAMS.md
-```
-
----
-
-# Data and logs
+### PFLT14 Data and Logs
 
 PFLT14 stores its local data here:
 
@@ -180,11 +211,9 @@ That folder may include settings, logs, debug text, CSV data, and screenshots.
 
 Those files are intentionally ignored by Git and should not be committed unless you have reviewed them.
 
----
+### PFLT14 Troubleshooting
 
-# Troubleshooting
-
-## App cannot connect
+#### App cannot connect
 
 Check:
 
@@ -194,15 +223,81 @@ Check:
 - UDP `161` is allowed from your PC to pfSense.
 - You are monitoring the correct pfSense interface.
 
-## Wrong interface is shown
+#### Wrong interface is shown
 
-Open Settings, run discovery, and manually select the correct interface/port.
+Open **Settings**, run discovery, and manually select the correct interface/port.
 
 PFLT14 saves that selection for the next launch.
 
-## Windows blocks the downloaded ZIP
+#### Windows blocks the downloaded ZIP
 
-Right-click the ZIP, choose Properties, check Unblock, click Apply, then extract again.
+Right-click the ZIP, choose **Properties**, check **Unblock**, click **Apply**, then extract again.
+
+---
+
+# Repository Layout
+
+Current major folders and files include:
+
+```text
+Visual-Studio-APPs/
+├─ AICreatureLab_v1.0.3/
+├─ AtomPlayground_WPF_CSharp_Project_v10_scientifically_grounded/
+├─ BioGenesisX_v15b/
+├─ DimensionExplorer_CSharp_WinForms_FIXED/
+├─ GreatFluidDynamics_Rebuilt/
+├─ GreatFluidDynamics_Rebuilt_v2/
+├─ HelixSolarShow_Project_v5/
+├─ LifeForgeAccelerated v9/
+├─ LifeForgeAccelerated_autoevolution_persistence/
+├─ LifeForgeAccelerated_gpu_multithreaded_final_fix2/
+├─ NewtonsCradleStudio_v3/
+├─ docs/
+├─ src/
+│  └─ PFLT14/
+├─ CHANGELOG.md
+├─ CONTRIBUTING.md
+├─ LICENSE
+├─ README.md
+└─ run_PFLT14.cmd
+```
+
+---
+
+# General Requirements
+
+Most projects in this repository are intended for Windows desktop development.
+
+Recommended tools:
+
+- Windows 10 or Windows 11
+- Visual Studio 2022
+- .NET 8 SDK
+- C# desktop development workload
+- A reasonably modern GPU for graphics-heavy projects
+- Enough RAM for large simulations
+
+Some projects may have their own requirements inside their project folders.
+
+---
+
+# How To Use This Repository
+
+1. Clone or download the repository.
+2. Open the project folder you want.
+3. Look for a `.sln`, `.csproj`, or run script.
+4. Restore dependencies if needed.
+5. Build in Visual Studio or with `dotnet build`.
+6. Run the app and experiment.
+
+Example command-line build:
+
+```bat
+dotnet restore
+dotnet build
+```
+
+Some projects may need to be opened directly in Visual Studio.
 
 ---
 
@@ -216,24 +311,25 @@ This repository exists to:
 - encourage experimentation
 - support home-lab communities
 - create understandable open projects
+- make visual software fun
+- show how C# can be used for simulations, dashboards, and graphics
 
 ---
 
-# Additional Projects
+# Safety And Security Notice
 
-This repository may also include:
+Some projects may interact with:
 
-- FPGA development projects
-- Vivado and Verilog examples
-- SDR tools and utilities
-- AI simulations and autonomous systems
-- Cluster-computing experiments
-- Minecraft AI and automation systems
-- Embedded-system development
-- Retro-computing projects
-- Visualization dashboards
-- Network-monitoring tools
-- Scientific simulations
+- routers
+- SNMP services
+- automation systems
+- local network devices
+- simulation engines
+- hardware experiments
+
+Always review configurations before exposing systems to public networks.
+
+Never publish private credentials, keys, SNMP community strings, router information, or sensitive network details.
 
 ---
 
@@ -253,30 +349,32 @@ Releases may include:
 
 # Planned Future Improvements
 
-- Additional SNMP sensor support
-- Historical graphing improvements
-- Multi-router monitoring
-- Improved interface auto-detection
-- Optional dark/light themes
-- Better packet-loss visualization
-- GPU-assisted visualizations
-- AI-assisted monitoring concepts
+Possible future improvements across the repository:
+
+- More screenshots for each project
+- Better per-project README files
+- More build-and-run scripts
+- Cleaner release ZIP packages
+- More telemetry and monitoring tools
+- More physics and science visualizations
+- More AI and artificial-life simulations
+- Better GPU/multithread support where practical
 
 ---
 
 # Notes
 
-This is a helpful home-lab telemetry dashboard.
+These are hobby, learning, science, graphics, AI, and home-lab projects.
 
-It is not a replacement for enterprise monitoring systems, but it is great for learning, visual checking, and watching a pfSense router live on a dedicated screen.
+They are meant to be useful, fun, understandable, and easy to experiment with.
 
-Stable and tested in long-running home-lab environments.
+PFLT14 is stable and tested in long-running home-lab environments.
 
 ---
 
 # License
 
-See the LICENSE file for licensing details.
+See the `LICENSE` file for licensing details.
 
 ---
 
