@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>AGWatch_REV12</AssemblyName>
+    <RootNamespace>AdGuardLiveWatch</RootNamespace>
+    <StartupObject>AdGuardLiveWatch.Program</StartupObject>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+  </PropertyGroup>
+
+</Project>

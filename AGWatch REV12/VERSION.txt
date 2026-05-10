@@ -1,0 +1,5 @@
+AGWatch REV12
+Assembly: AGWatch_REV12
+Target: net8.0-windows
+UI: Windows Forms
+Settings: Documents\AGWatch\settings.json
